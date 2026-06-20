@@ -4,6 +4,12 @@ import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { QuizProvider } from "@/hooks/useQuizStore"
 import { cn } from "@/lib/utils"
+import { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "QuizBurst - Learn, Play, Conquer",
+  description: "An interactive, gamified quiz platform to master TypeScript, Science, History, and more. Built for learners of all ages by Uzaif Academy.",
+}
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -29,6 +35,7 @@ export default function RootLayout({
       className={cn("antialiased", plusJakartaSans.variable, hankenGrotesk.variable)}
     >
       <head>
+        {/* eslint-disable-next-line @next/next/no-page-custom-font */}
         <link
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
           rel="stylesheet"

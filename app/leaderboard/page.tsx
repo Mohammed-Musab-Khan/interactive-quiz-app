@@ -3,6 +3,9 @@
 import React, { useEffect, useState } from "react"
 import { Sidebar } from "@/components/Sidebar"
 import { useQuizStore } from "@/hooks/useQuizStore"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 
 interface Competitor {
   name: string
@@ -18,7 +21,8 @@ export default function LeaderboardPage() {
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    setMounted(true)
+    const handle = requestAnimationFrame(() => setMounted(true))
+    return () => cancelAnimationFrame(handle)
   }, [])
 
   if (!mounted) {
@@ -56,6 +60,8 @@ export default function LeaderboardPage() {
     return { text: String(rank), bg: "bg-surface-container-high text-on-surface-variant" }
   }
 
+  const userInitials = profile.name.split(" ").map(n => n[0]).join("").toUpperCase()
+
   return (
     <div className="min-h-screen bg-background text-on-background lg:flex">
       <Sidebar />
@@ -74,26 +80,26 @@ export default function LeaderboardPage() {
 
           {/* Toggle Tabs */}
           <div className="flex border border-outline-variant/30 rounded-2xl bg-surface-container-low p-1 w-full sm:w-fit">
-            <button
+            <Button
               onClick={() => setActiveTab("weekly")}
-              className={`flex-1 sm:flex-initial px-8 py-2.5 rounded-xl font-display text-xs font-bold transition-all cursor-pointer ${
+              className={`flex-1 sm:flex-initial px-8 py-2.5 rounded-xl font-display text-xs font-bold transition-all cursor-pointer h-auto border-0 shadow-none ${
                 activeTab === "weekly"
-                  ? "bg-surface-container-lowest text-primary shadow-sm dark:text-primary-fixed-dim"
-                  : "text-on-surface-variant hover:text-on-surface"
+                  ? "bg-surface-container-lowest text-primary shadow-sm dark:text-primary-fixed-dim hover:bg-surface-container-lowest/90"
+                  : "bg-transparent text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high"
               }`}
             >
               This Week
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => setActiveTab("alltime")}
-              className={`flex-1 sm:flex-initial px-8 py-2.5 rounded-xl font-display text-xs font-bold transition-all cursor-pointer ${
+              className={`flex-1 sm:flex-initial px-8 py-2.5 rounded-xl font-display text-xs font-bold transition-all cursor-pointer h-auto border-0 shadow-none ${
                 activeTab === "alltime"
-                  ? "bg-surface-container-lowest text-primary shadow-sm dark:text-primary-fixed-dim"
-                  : "text-on-surface-variant hover:text-on-surface"
+                  ? "bg-surface-container-lowest text-primary shadow-sm dark:text-primary-fixed-dim hover:bg-surface-container-lowest/90"
+                  : "bg-transparent text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high"
               }`}
             >
               All Time
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -103,13 +109,12 @@ export default function LeaderboardPage() {
           {activeList[1] && (
             <div className="flex flex-col items-center">
               <div className="relative">
-                {activeList[1].avatar ? (
-                  <img src={activeList[1].avatar} alt="" className="w-12 h-12 md:w-16 md:h-16 rounded-full border-2 border-slate-300 object-cover shadow" />
-                ) : (
-                  <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-primary-container text-on-primary-container font-display font-bold flex items-center justify-center border-2 border-slate-300 shadow">
-                    {activeList[1].name.slice(0, 2).toUpperCase()}
-                  </div>
-                )}
+                <Avatar className="w-12 h-12 md:w-16 md:h-16 rounded-full border-2 border-slate-300 shadow">
+                  <AvatarImage className="object-cover" src={activeList[1].avatar} alt="" />
+                  <AvatarFallback className="bg-primary-container text-on-primary-container font-display font-bold flex items-center justify-center">
+                    {activeList[1].isUser ? userInitials : activeList[1].name.slice(0, 2).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
                 <span className="absolute -top-2 -right-1 text-lg">🥈</span>
               </div>
               <div className="text-center mt-2 w-full">
@@ -130,13 +135,12 @@ export default function LeaderboardPage() {
           {activeList[0] && (
             <div className="flex flex-col items-center">
               <div className="relative">
-                {activeList[0].avatar ? (
-                  <img src={activeList[0].avatar} alt="" className="w-16 h-16 md:w-20 md:h-20 rounded-full border-4 border-amber-400 object-cover shadow-lg" />
-                ) : (
-                  <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-primary-container text-on-primary-container font-display font-bold flex items-center justify-center border-4 border-amber-400 shadow-lg">
-                    {activeList[0].name.slice(0, 2).toUpperCase()}
-                  </div>
-                )}
+                <Avatar className="w-16 h-16 md:w-20 md:h-20 rounded-full border-4 border-amber-400 shadow-lg">
+                  <AvatarImage className="object-cover" src={activeList[0].avatar} alt="" />
+                  <AvatarFallback className="bg-primary-container text-on-primary-container font-display font-bold flex items-center justify-center">
+                    {activeList[0].isUser ? userInitials : activeList[0].name.slice(0, 2).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
                 <span className="absolute -top-3 -right-2 text-2xl animate-bounce">👑</span>
               </div>
               <div className="text-center mt-2 w-full">
@@ -157,13 +161,12 @@ export default function LeaderboardPage() {
           {activeList[2] && (
             <div className="flex flex-col items-center">
               <div className="relative">
-                {activeList[2].avatar ? (
-                  <img src={activeList[2].avatar} alt="" className="w-12 h-12 md:w-16 md:h-16 rounded-full border-2 border-amber-700/30 object-cover shadow" />
-                ) : (
-                  <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-primary-container text-on-primary-container font-display font-bold flex items-center justify-center border-2 border-amber-700/30 shadow">
-                    {activeList[2].name.slice(0, 2).toUpperCase()}
-                  </div>
-                )}
+                <Avatar className="w-12 h-12 md:w-16 md:h-16 rounded-full border-2 border-amber-700/30 shadow">
+                  <AvatarImage className="object-cover" src={activeList[2].avatar} alt="" />
+                  <AvatarFallback className="bg-primary-container text-on-primary-container font-display font-bold flex items-center justify-center">
+                    {activeList[2].isUser ? userInitials : activeList[2].name.slice(0, 2).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
                 <span className="absolute -top-2 -right-1 text-lg">🥉</span>
               </div>
               <div className="text-center mt-2 w-full">
@@ -182,50 +185,51 @@ export default function LeaderboardPage() {
         </div>
 
         {/* Competitor List Table */}
-        <div className="bg-surface-container-lowest border border-outline-variant/30 rounded-3xl overflow-hidden shadow-sm flex flex-col animate-pop-in">
-          {activeList.map((user, idx) => {
-            const rank = idx + 1
-            const badge = getRankBadge(rank)
+        <Card className="bg-surface-container-lowest border border-outline-variant/30 rounded-3xl overflow-hidden shadow-sm flex flex-col animate-pop-in ring-0">
+          <CardContent className="p-0 flex flex-col">
+            {activeList.map((user, idx) => {
+              const rank = idx + 1
+              const badge = getRankBadge(rank)
 
-            return (
-              <div
-                key={user.name}
-                className={`flex items-center gap-4 px-6 py-4 border-b border-outline-variant/10 last:border-b-0 ${
-                  user.isUser ? "bg-primary-fixed/15 border-l-4 border-l-primary" : ""
-                }`}
-              >
-                {/* Rank indicator */}
-                <div className={`w-8 h-8 rounded-full border flex items-center justify-center font-display font-extrabold text-xs shrink-0 ${badge.bg}`}>
-                  {badge.text}
-                </div>
-
-                {/* Avatar */}
-                {user.avatar ? (
-                  <img src={user.avatar} alt="" className="w-10 h-10 rounded-full object-cover shrink-0" />
-                ) : (
-                  <div className="w-10 h-10 rounded-full bg-primary-container text-on-primary-container font-display font-bold text-xs flex items-center justify-center shrink-0 border border-primary/10">
-                    {user.name.split(" ").map(n => n[0]).join("").toUpperCase()}
+              return (
+                <div
+                  key={user.name}
+                  className={`flex items-center gap-4 px-6 py-4 border-b border-outline-variant/10 last:border-b-0 ${
+                    user.isUser ? "bg-primary-fixed/15 border-l-4 border-l-primary" : ""
+                  }`}
+                >
+                  {/* Rank indicator */}
+                  <div className={`w-8 h-8 rounded-full border flex items-center justify-center font-display font-extrabold text-xs shrink-0 ${badge.bg}`}>
+                    {badge.text}
                   </div>
-                )}
 
-                {/* Name & Title */}
-                <div className="flex-1 min-w-0">
-                  <div className={`font-display text-sm truncate ${user.isUser ? "font-extrabold text-primary dark:text-primary-fixed-dim" : "font-bold text-on-surface"}`}>
-                    {user.name}
+                  {/* Avatar */}
+                  <Avatar className="w-10 h-10 rounded-full shrink-0 border border-outline-variant/20">
+                    <AvatarImage className="object-cover" src={user.avatar} alt="" />
+                    <AvatarFallback className="bg-primary-container text-on-primary-container font-display font-bold text-xs flex items-center justify-center">
+                      {user.isUser ? userInitials : user.name.split(" ").map(n => n[0]).join("").toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+
+                  {/* Name & Title */}
+                  <div className="flex-1 min-w-0">
+                    <div className={`font-display text-sm truncate ${user.isUser ? "font-extrabold text-primary dark:text-primary-fixed-dim" : "font-bold text-on-surface"}`}>
+                      {user.name}
+                    </div>
+                    <div className="text-[10px] text-on-surface-variant font-semibold truncate mt-0.5">
+                      {user.title}
+                    </div>
                   </div>
-                  <div className="text-[10px] text-on-surface-variant font-semibold truncate mt-0.5">
-                    {user.title}
+
+                  {/* XP Score */}
+                  <div className="shrink-0 font-display text-sm font-extrabold text-on-surface text-right">
+                    {user.xp.toLocaleString()} <span className="text-[10px] text-on-surface-variant font-bold">XP</span>
                   </div>
                 </div>
-
-                {/* XP Score */}
-                <div className="shrink-0 font-display text-sm font-extrabold text-on-surface text-right">
-                  {user.xp.toLocaleString()} <span className="text-[10px] text-on-surface-variant font-bold">XP</span>
-                </div>
-              </div>
-            )
-          })}
-        </div>
+              )
+            })}
+          </CardContent>
+        </Card>
 
       </main>
     </div>

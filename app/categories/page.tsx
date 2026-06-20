@@ -4,6 +4,10 @@ import React, { useEffect, useState } from "react"
 import Link from "next/link"
 import { Sidebar } from "@/components/Sidebar"
 import { CATEGORIES, QUIZZES } from "@/lib/quizData"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
 
 type DifficultyFilter = "all" | "junior" | "pro" | "master"
 
@@ -12,7 +16,8 @@ export default function CategoriesPage() {
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    setMounted(true)
+    const handle = requestAnimationFrame(() => setMounted(true))
+    return () => cancelAnimationFrame(handle)
   }, [])
 
   if (!mounted) {
@@ -56,17 +61,17 @@ export default function CategoriesPage() {
             {difficulties.map((diff) => {
               const active = selectedDifficulty === diff.id
               return (
-                <button
+                <Button
                   key={diff.id}
                   onClick={() => setSelectedDifficulty(diff.id)}
-                  className={`flex-shrink-0 px-5 py-2 rounded-full font-display text-xs font-bold transition-all duration-200 cursor-pointer shadow-sm border ${
+                  className={`flex-shrink-0 px-5 py-2 rounded-full font-display text-xs font-bold transition-all duration-200 cursor-pointer shadow-sm border h-auto ${
                     active
                       ? "bg-primary text-on-primary border-primary ring-2 ring-primary ring-offset-2 ring-offset-background scale-105"
-                      : "bg-surface-container-high text-on-surface-variant border-outline-variant/30 hover:bg-surface-variant"
+                      : "bg-surface-container-high text-on-surface-variant border-outline-variant/30 hover:bg-surface-variant hover:text-on-surface"
                   }`}
                 >
                   {diff.label} ({diff.ageRange})
-                </button>
+                </Button>
               )
             })}
           </div>
@@ -83,39 +88,53 @@ export default function CategoriesPage() {
               ? "col-span-2 md:col-span-2 lg:col-span-2 lg:flex-row lg:justify-start lg:px-8" 
               : "flex-col justify-center"
 
+            const detailAlign = category.id === "history"
+              ? "items-center lg:items-start text-center lg:text-left"
+              : "items-center text-center"
+
             return (
               <Link
                 key={category.id}
                 href={`/categories/${category.id}?diff=${selectedDifficulty}`}
-                className={`group bg-surface-container-lowest border border-outline-variant/30 rounded-2xl p-6 flex items-center gap-4 relative overflow-hidden bento-shadow hover:-translate-y-1 hover:shadow-md transition-all duration-200 active:scale-95 animate-pop-in ${colSpan}`}
-                style={{ animationDelay: `${index * 50}ms` }}
+                className={`group ${colSpan} active:scale-95 transition-transform duration-200`}
               >
-                {/* Visual hover gradient */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${category.bgGradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+                <Card
+                  className={`bg-surface-container-lowest border border-outline-variant/30 rounded-2xl p-6 flex items-center gap-4 relative overflow-hidden bento-shadow hover:-translate-y-1 hover:shadow-md transition-all duration-200 h-full w-full ring-0 ${
+                    category.id === "history" ? "flex-row justify-start" : "flex-col justify-center"
+                  }`}
+                  style={{ animationDelay: `${index * 50}ms` }}
+                >
+                  <CardContent className="p-0 flex flex-col items-center lg:flex-row gap-4 relative z-10 w-full justify-center lg:justify-start">
+                    {/* Visual hover gradient */}
+                    <div className={`absolute inset-[-24px] bg-gradient-to-br ${category.bgGradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none`} />
 
-                {/* Icon wrapper */}
-                <div className={`w-16 h-16 rounded-full flex items-center justify-center shrink-0 shadow-sm relative z-10 transition-transform duration-300 group-hover:scale-110 ${category.badgeBg}`}>
-                  <span className="material-symbols-outlined text-[36px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-                    {category.icon}
-                  </span>
-                </div>
+                    {/* Icon wrapper */}
+                    <Avatar className={`w-16 h-16 rounded-full flex items-center justify-center shrink-0 shadow-sm relative z-10 transition-transform duration-300 group-hover:scale-110 ${category.badgeBg}`}>
+                      <AvatarFallback className="bg-transparent text-inherit flex items-center justify-center">
+                        <span className="material-symbols-outlined text-[36px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+                          {category.icon}
+                        </span>
+                      </AvatarFallback>
+                    </Avatar>
 
-                {/* Text details */}
-                <div className="flex flex-col items-center lg:items-start text-center lg:text-left relative z-10">
-                  <h3 className="font-display text-lg font-extrabold text-on-surface group-hover:text-primary dark:group-hover:text-primary-fixed-dim transition-colors">
-                    {category.name}
-                  </h3>
-                  
-                  {category.id === "history" && (
-                    <p className="font-sans text-xs text-on-surface-variant hidden lg:block mt-1 mb-2 max-w-xs font-medium">
-                      Travel back in time and test your knowledge of past world-changing events and empires.
-                    </p>
-                  )}
+                    {/* Text details */}
+                    <div className={`flex flex-col ${detailAlign} relative z-10`}>
+                      <h3 className="font-display text-lg font-extrabold text-on-surface group-hover:text-primary dark:group-hover:text-primary-fixed-dim transition-colors">
+                        {category.name}
+                      </h3>
+                      
+                      {category.id === "history" && (
+                        <p className="font-sans text-xs text-on-surface-variant hidden lg:block mt-1 mb-2 max-w-xs font-medium">
+                          Travel back in time and test your knowledge of past world-changing events and empires.
+                        </p>
+                      )}
 
-                  <span className="font-display text-[10px] font-bold text-on-surface-variant bg-surface-container px-2.5 py-1 rounded-md mt-2">
-                    {countLabel}
-                  </span>
-                </div>
+                      <Badge variant="outline" className="font-display text-[10px] font-bold text-on-surface-variant bg-surface-container px-2.5 py-1 rounded-md mt-2 border-0 h-auto">
+                        {countLabel}
+                      </Badge>
+                    </div>
+                  </CardContent>
+                </Card>
               </Link>
             )
           })}

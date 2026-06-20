@@ -6,6 +6,8 @@ import { usePathname } from "next/navigation"
 import { useTheme } from "next-themes"
 import { useQuizStore } from "@/hooks/useQuizStore"
 import { getSoundManager } from "@/lib/SoundManager"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
 
 export function Sidebar() {
   const pathname = usePathname()
@@ -16,11 +18,14 @@ export function Sidebar() {
 
   // Avoid hydration mismatch
   useEffect(() => {
-    setMounted(true)
-    const sm = getSoundManager()
-    if (sm) {
-      setIsMuted(sm.getMuteStatus())
-    }
+    const handle = requestAnimationFrame(() => {
+      setMounted(true)
+      const sm = getSoundManager()
+      if (sm) {
+        setIsMuted(sm.getMuteStatus())
+      }
+    })
+    return () => cancelAnimationFrame(handle)
   }, [])
 
   const toggleMute = () => {
@@ -70,34 +75,37 @@ export function Sidebar() {
         </Link>
         <div className="flex items-center gap-2">
           {/* Sound Toggle */}
-          <button
+          <Button
             onClick={toggleMute}
-            className="rounded-full p-2 text-primary hover:bg-surface-container-high transition-colors dark:text-primary-fixed"
+            className="rounded-full p-2 text-primary hover:bg-surface-container-high transition-colors dark:text-primary-fixed bg-transparent border-0 shadow-none size-9"
             aria-label="Toggle Sound"
+            size="icon"
           >
             <span className="material-symbols-outlined text-[24px]">
               {isMuted ? "volume_off" : "volume_up"}
             </span>
-          </button>
+          </Button>
           
           {/* Theme Toggle */}
-          <button
+          <Button
             onClick={toggleTheme}
-            className="rounded-full p-2 text-primary hover:bg-surface-container-high transition-colors dark:text-primary-fixed"
+            className="rounded-full p-2 text-primary hover:bg-surface-container-high transition-colors dark:text-primary-fixed bg-transparent border-0 shadow-none size-9"
             aria-label="Toggle Theme"
+            size="icon"
           >
             <span className="material-symbols-outlined text-[24px]">
               {theme === "dark" ? "light_mode" : "dark_mode"}
             </span>
-          </button>
+          </Button>
 
           {/* Profile link */}
-          <Link
-            href="/stats"
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-container font-display text-xs font-bold text-on-primary-container ring-2 ring-primary ring-offset-2 ring-offset-background"
-          >
-            {initials}
-          </Link>
+          <Avatar className="h-9 w-9 bg-primary-container font-display text-xs font-bold text-on-primary-container ring-2 ring-primary ring-offset-2 ring-offset-background">
+            <Link href="/stats" className="w-full h-full flex items-center justify-center">
+              <AvatarFallback className="bg-transparent text-inherit font-display text-xs font-bold">
+                {initials}
+              </AvatarFallback>
+            </Link>
+          </Avatar>
         </div>
       </header>
 
@@ -110,9 +118,11 @@ export function Sidebar() {
 
         {/* User Card */}
         <div className="mb-6 flex items-center gap-3 rounded-xl border border-outline-variant/20 bg-surface-container-low p-3 shadow-sm dark:bg-surface-container-highest/20">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-container font-display text-sm font-bold text-on-primary-container">
-            {initials}
-          </div>
+          <Avatar className="h-10 w-10 shrink-0 bg-primary-container font-display text-sm font-bold text-on-primary-container">
+            <AvatarFallback className="bg-transparent text-inherit font-display text-sm font-bold">
+              {initials}
+            </AvatarFallback>
+          </Avatar>
           <div className="min-w-0">
             <div className="truncate font-display text-sm font-bold text-on-surface">
               {profile.name}
@@ -154,38 +164,40 @@ export function Sidebar() {
           <div className="flex items-center justify-between px-2 text-on-surface-variant">
             <span className="text-xs font-semibold">Toggles</span>
             <div className="flex gap-2">
-              <button
+              <Button
                 onClick={toggleMute}
-                className="rounded-full p-2 hover:bg-surface-container-high transition-colors"
+                className="rounded-full p-2 hover:bg-surface-container-high transition-colors bg-transparent border-0 shadow-none size-8"
                 title="Toggle Mute"
+                size="icon"
               >
                 <span className="material-symbols-outlined text-[20px]">
                   {isMuted ? "volume_off" : "volume_up"}
                 </span>
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={toggleTheme}
-                className="rounded-full p-2 hover:bg-surface-container-high transition-colors"
+                className="rounded-full p-2 hover:bg-surface-container-high transition-colors bg-transparent border-0 shadow-none size-8"
                 title="Toggle Theme"
+                size="icon"
               >
                 <span className="material-symbols-outlined text-[20px]">
                   {theme === "dark" ? "light_mode" : "dark_mode"}
                 </span>
-              </button>
+              </Button>
             </div>
           </div>
 
-          <button
+          <Button
             onClick={() => {
               if (confirm("Are you sure you want to reset all your progress (XP, streaks, etc.)?")) {
                 resetData()
               }
             }}
-            className="chunky-btn-secondary flex w-full items-center justify-center gap-2 rounded-xl bg-surface-container-lowest py-2.5 font-display text-xs text-on-surface transition-all active:scale-[0.98] font-bold"
+            className="chunky-btn-secondary flex w-full items-center justify-center gap-2 rounded-xl bg-surface-container-lowest py-2.5 font-display text-xs text-on-surface transition-all active:scale-[0.98] font-bold h-auto hover:bg-surface-container-low"
           >
             <span className="material-symbols-outlined text-sm">restart_alt</span>
             Reset Progress
-          </button>
+          </Button>
 
           <div className="rounded-xl bg-primary-fixed/20 p-3 text-center border border-primary/20">
             <div className="text-xs font-bold text-primary dark:text-primary-fixed-dim">🏫 Uzaif Academy</div>

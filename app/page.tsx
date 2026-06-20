@@ -2,9 +2,15 @@
 
 import React, { useEffect, useState } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { Sidebar } from "@/components/Sidebar"
 import { useQuizStore } from "@/hooks/useQuizStore"
 import { QUIZZES } from "@/lib/quizData"
+import { Card, CardContent } from "@/components/ui/card"
+import { Progress } from "@/components/ui/progress"
+import { Badge } from "@/components/ui/badge"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
 
 export default function HomePage() {
   const { profile, activeQuizzes } = useQuizStore()
@@ -12,7 +18,8 @@ export default function HomePage() {
 
   // Prevent hydration mismatch
   useEffect(() => {
-    setMounted(true)
+    const handle = requestAnimationFrame(() => setMounted(true))
+    return () => cancelAnimationFrame(handle)
   }, [])
 
   if (!mounted) {
@@ -66,6 +73,8 @@ export default function HomePage() {
     item.rank = idx + 1
   })
 
+  const userInitials = profile.name.split(" ").map(n => n[0]).join("").toUpperCase()
+
   return (
     <div className="min-h-screen bg-background text-on-background lg:flex">
       {/* Sidebar Layout Navigation */}
@@ -87,7 +96,7 @@ export default function HomePage() {
             </div>
             
             {/* Streak card */}
-            <div className="flex items-center gap-3 bg-surface-container-lowest p-3 rounded-2xl border border-outline-variant/30 shadow-sm w-fit animate-slide-in">
+            <Card className="flex flex-row items-center gap-3 bg-surface-container-lowest p-3 rounded-2xl border border-outline-variant/30 shadow-sm w-fit animate-slide-in ring-0">
               <span 
                 className="material-symbols-outlined text-secondary text-[32px]" 
                 style={{ fontVariationSettings: "'FILL' 1" }}
@@ -100,19 +109,19 @@ export default function HomePage() {
                 </div>
                 <div className="text-[10px] text-on-surface-variant font-semibold">Keep it burning!</div>
               </div>
-            </div>
+            </Card>
           </section>
 
           {/* Uzaif Academy Branding & Enrollment CTA */}
-          <section className="bg-gradient-to-r from-tertiary-container/10 to-primary-container/10 rounded-3xl p-6 border border-outline-variant/30 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6 animate-pop-in">
+          <Card className="bg-gradient-to-r from-tertiary-container/10 to-primary-container/10 rounded-3xl p-6 border border-outline-variant/30 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6 animate-pop-in ring-0">
             <div className="flex-1">
               <div className="flex flex-wrap items-center gap-2 mb-2">
-                <span className="font-display text-xs font-extrabold text-primary dark:text-primary-fixed-dim uppercase tracking-wider bg-primary-fixed/30 px-3 py-1 rounded-full border border-primary/10">
+                <Badge variant="outline" className="font-display text-xs font-extrabold text-primary dark:text-primary-fixed-dim uppercase tracking-wider bg-primary-fixed/30 px-3 py-1 rounded-full border border-primary/10 h-auto">
                   🏫 Uzaif Academy
-                </span>
-                <span className="font-display text-[10px] font-bold text-on-tertiary-fixed-variant bg-tertiary-fixed/30 px-2.5 py-1 rounded-full border border-tertiary/10">
+                </Badge>
+                <Badge variant="outline" className="font-display text-[10px] font-bold text-on-tertiary-fixed-variant bg-tertiary-fixed/30 px-2.5 py-1 rounded-full border border-tertiary/10 h-auto">
                   Interactive Coding Course
-                </span>
+                </Badge>
               </div>
               <h2 className="font-display text-xl md:text-2xl font-extrabold text-on-surface leading-tight">
                 Want to build your own Quiz App like QuizBurst? 🚀
@@ -121,29 +130,33 @@ export default function HomePage() {
                 Parents & Kids: Learn how to program interactive projects from scratch! Enroll in Uzaif Academy to master TypeScript, React, and Next.js step-by-step.
               </p>
             </div>
-            <a
-              href="https://learn.uzaif.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="chunky-btn bg-secondary text-on-secondary-fixed font-display text-sm px-8 py-3.5 rounded-full flex items-center gap-2 font-bold cursor-pointer shrink-0 hover:scale-105 active:scale-95 transition-transform"
+            <Button
+              asChild
+              className="chunky-btn bg-secondary text-on-secondary-fixed hover:bg-secondary/95 font-display text-sm px-8 py-3.5 rounded-full flex items-center gap-2 font-bold cursor-pointer shrink-0 hover:scale-105 active:scale-95 transition-transform h-auto border-0"
             >
-              Enroll Now @ learn.uzaif.com
-              <span className="material-symbols-outlined text-[20px]">school</span>
-            </a>
-          </section>
+              <a
+                href="https://learn.uzaif.com"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Enroll Now @ learn.uzaif.com
+                <span className="material-symbols-outlined text-[20px]">school</span>
+              </a>
+            </Button>
+          </Card>
 
           {/* Bento Grid: Daily Challenge + Leaderboard */}
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
             
             {/* Daily Challenge Tile (8 Cols on Desktop) */}
-            <div className="col-span-1 md:col-span-8 bg-primary-container text-on-primary-container rounded-3xl p-6 md:p-8 flex flex-col sm:flex-row justify-between items-center overflow-hidden relative border border-outline-variant/30 shadow-sm min-h-[260px] animate-pop-in">
+            <Card className="col-span-1 md:col-span-8 bg-primary-container text-on-primary-container rounded-3xl p-6 md:p-8 flex flex-col sm:flex-row justify-between items-center overflow-hidden relative border border-outline-variant/30 shadow-sm min-h-[260px] animate-pop-in ring-0">
               <div className="relative z-10 flex flex-col items-start gap-4 max-w-full sm:max-w-[60%]">
-                <div className="bg-on-primary-container/20 px-3 py-1 rounded-full font-display text-xs font-bold inline-flex items-center gap-1.5 backdrop-blur-md text-white border border-white/10">
+                <Badge variant="outline" className="bg-on-primary-container/20 px-3 py-1 rounded-full font-display text-xs font-bold inline-flex items-center gap-1.5 backdrop-blur-md text-white border border-white/10 h-auto">
                   <span className="material-symbols-outlined text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>
                     stars
                   </span> 
                   Daily Challenge
-                </div>
+                </Badge>
                 <div>
                   <h2 className="font-display text-3xl font-extrabold tracking-tight text-white">
                     Cosmic Physics Basics
@@ -152,27 +165,32 @@ export default function HomePage() {
                     +500 XP on Completion
                   </p>
                 </div>
-                <Link
-                  href="/quiz/cosmic-physics-basics"
-                  className="chunky-btn bg-primary text-on-primary font-display text-sm px-6 py-3 rounded-full mt-2 flex items-center gap-2 font-bold cursor-pointer shadow-lg hover:scale-105 active:scale-95 transition-transform"
+                <Button
+                  asChild
+                  className="chunky-btn bg-primary text-on-primary font-display text-sm px-6 py-3 rounded-full mt-2 flex items-center gap-2 font-bold cursor-pointer shadow-lg hover:scale-105 active:scale-95 transition-transform h-auto border-0"
                 >
-                  Play Now
-                  <span className="material-symbols-outlined text-[18px]">play_arrow</span>
-                </Link>
+                  <Link href="/quiz/cosmic-physics-basics">
+                    Play Now
+                    <span className="material-symbols-outlined text-[18px]">play_arrow</span>
+                  </Link>
+                </Button>
               </div>
 
               {/* Decorative 3D Illustration Planet */}
               <div className="absolute right-0 bottom-0 w-1/2 h-[120%] translate-y-[15%] translate-x-[5%] z-0 opacity-40 sm:opacity-90 pointer-events-none mix-blend-luminosity">
-                <img 
-                  className="w-full h-full object-contain" 
+                <Image 
+                  className="object-contain" 
                   alt="Planet Physics Illustration" 
                   src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJy9XkuEN5pxAzVPMRyJuO7mvRD_Oqh6--BSdihWx1N1PVqvgyBq5qnokzPqLaNyI9IgNEgetHMj0qclgiQp_xexo3o4tp4IhXtDd31kppUlZyY8HSJ6xqjsmWGyJRQVSitmofiuppxNUMAw2wEmBnxkTbjJNl2oJtApkpdDX009bxjZ7amQVdcwWG-EfOlnAJmWWuUWkczXmDqjz6UMyQ5cn9yZ2S7xABcqsf1-TpEjr9wgdS0kRSrhBfF-cRB3BRG9chhv7MurFq"
+                  fill
+                  sizes="(max-width: 640px) 50vw, 30vw"
+                  priority
                 />
               </div>
-            </div>
+            </Card>
 
             {/* Leaderboard Summary Tile (4 Cols on Desktop) */}
-            <div className="col-span-1 md:col-span-4 bg-surface-container-lowest rounded-3xl p-6 border border-outline-variant/30 shadow-sm flex flex-col gap-4 animate-pop-in">
+            <Card className="col-span-1 md:col-span-4 bg-surface-container-lowest rounded-3xl p-6 border border-outline-variant/30 shadow-sm flex flex-col gap-4 animate-pop-in ring-0">
               <div className="flex items-center justify-between">
                 <h3 className="font-display text-lg font-bold text-on-surface">Top Learners</h3>
                 <span className="material-symbols-outlined text-outline cursor-pointer hover:text-primary transition-colors">
@@ -192,17 +210,12 @@ export default function HomePage() {
                       {user.rank}
                     </div>
 
-                    {user.avatar ? (
-                      <img 
-                        className="w-10 h-10 rounded-full object-cover shrink-0 border border-outline-variant/20" 
-                        alt={user.name} 
-                        src={user.avatar} 
-                      />
-                    ) : (
-                      <div className="w-10 h-10 rounded-full shrink-0 bg-primary-container text-on-primary-container font-display font-bold text-xs flex items-center justify-center border border-primary/10">
-                        {profile.name.split(" ").map(n => n[0]).join("").toUpperCase()}
-                      </div>
-                    )}
+                    <Avatar className="w-10 h-10 rounded-full border border-outline-variant/20 shrink-0">
+                      <AvatarImage className="object-cover" alt={user.name} src={user.avatar} />
+                      <AvatarFallback className="bg-primary-container text-on-primary-container font-display font-bold text-xs flex items-center justify-center">
+                        {user.isUser ? userInitials : user.name.split(" ").map(n => n[0]).join("").toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
 
                     <div className="flex-1 min-w-0">
                       <div className={`font-display text-sm truncate ${user.isUser ? "font-bold text-primary dark:text-primary-fixed-dim" : "font-semibold text-on-surface"}`}>
@@ -215,7 +228,7 @@ export default function HomePage() {
                   </div>
                 ))}
               </div>
-            </div>
+            </Card>
           </div>
 
           {/* Continue Playing Section */}
@@ -226,48 +239,49 @@ export default function HomePage() {
               
               {displayActiveQuizzes.map((quiz, index) => {
                 // Determine theme badge colors based on category
-                let badgeClass = "bg-primary-fixed text-on-primary-fixed"
-                if (quiz.category === "science") badgeClass = "bg-tertiary-fixed text-on-tertiary-fixed"
-                else if (quiz.category === "history") badgeClass = "bg-secondary-fixed/50 text-on-secondary-fixed-variant"
-                else if (quiz.category === "coding") badgeClass = "bg-primary-fixed-dim text-on-primary-fixed-variant"
+                let badgeClass = "bg-primary-fixed text-on-primary-fixed border-transparent"
+                if (quiz.category === "science") badgeClass = "bg-tertiary-fixed text-on-tertiary-fixed border-transparent"
+                else if (quiz.category === "history") badgeClass = "bg-secondary-fixed/50 text-on-secondary-fixed-variant border-transparent"
+                else if (quiz.category === "coding") badgeClass = "bg-primary-fixed-dim text-on-primary-fixed-variant border-transparent"
 
                 return (
                   <Link 
                     key={quiz.id}
                     href={`/quiz/${quiz.id}`}
-                    className="bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant/30 shadow-sm flex flex-col justify-between gap-6 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer group animate-pop-in"
-                    style={{ animationDelay: `${index * 100}ms` }}
+                    className="group"
                   >
-                    <div className="flex justify-between items-start">
-                      <div className={`px-3 py-1 rounded-full font-display text-[10px] font-bold uppercase tracking-wider ${badgeClass}`}>
-                        {quiz.category}
-                      </div>
-                      <span className="material-symbols-outlined text-outline group-hover:text-primary group-hover:translate-x-0.5 transition-all duration-200">
-                        arrow_forward
-                      </span>
-                    </div>
-
-                    <div>
-                      <h4 className="font-display text-lg font-extrabold text-on-surface group-hover:text-primary dark:group-hover:text-primary-fixed-dim transition-colors mb-2">
-                        {quiz.title}
-                      </h4>
-                      
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="w-full h-3 bg-surface-container-high rounded-full overflow-hidden">
-                          <div 
-                            className="h-full progress-gradient rounded-full" 
-                            style={{ width: `${quiz.progressPercent}%` }}
-                          ></div>
+                    <Card 
+                      className="bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant/30 shadow-sm flex flex-col justify-between gap-6 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer animate-pop-in ring-0"
+                      style={{ animationDelay: `${index * 100}ms` }}
+                    >
+                      <CardContent className="p-0 flex flex-col justify-between h-full gap-6">
+                        <div className="flex justify-between items-start w-full">
+                          <Badge variant="outline" className={`px-3 py-1 rounded-full font-display text-[10px] font-bold uppercase tracking-wider h-auto ${badgeClass}`}>
+                            {quiz.category}
+                          </Badge>
+                          <span className="material-symbols-outlined text-outline group-hover:text-primary group-hover:translate-x-0.5 transition-all duration-200">
+                            arrow_forward
+                          </span>
                         </div>
-                        <span className="font-display text-xs font-bold text-on-surface-variant">
-                          {quiz.progressPercent}%
-                        </span>
-                      </div>
-                      
-                      <p className="text-xs text-on-surface-variant font-medium">
-                        {quiz.questionText}
-                      </p>
-                    </div>
+
+                        <div className="w-full">
+                          <h4 className="font-display text-lg font-extrabold text-on-surface group-hover:text-primary dark:group-hover:text-primary-fixed-dim transition-colors mb-2">
+                            {quiz.title}
+                          </h4>
+                          
+                          <div className="flex items-center gap-2 mb-2">
+                            <Progress value={quiz.progressPercent} className="h-3 bg-surface-container-high rounded-full [&_[data-slot=progress-indicator]]:progress-gradient" />
+                            <span className="font-display text-xs font-bold text-on-surface-variant">
+                              {quiz.progressPercent}%
+                            </span>
+                          </div>
+                          
+                          <p className="text-xs text-on-surface-variant font-medium">
+                            {quiz.questionText}
+                          </p>
+                        </div>
+                      </CardContent>
+                    </Card>
                   </Link>
                 )
               })}
@@ -275,17 +289,23 @@ export default function HomePage() {
               {/* Start a New Topic Card (Dashed) */}
               <Link
                 href="/categories"
-                className="bg-surface/50 rounded-2xl p-6 border-dashed border-2 border-primary-fixed hover:border-primary/50 flex flex-col items-center justify-center gap-4 hover:shadow-sm transition-all duration-200 cursor-pointer group min-h-[180px] animate-pop-in"
-                style={{ animationDelay: "200ms" }}
+                className="group"
               >
-                <div className="w-12 h-12 rounded-full bg-primary-fixed text-primary flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm">
-                  <span className="material-symbols-outlined text-[28px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-                    add
-                  </span>
-                </div>
-                <div className="font-display text-base text-on-surface font-bold text-center">
-                  Start a New Topic
-                </div>
+                <Card 
+                  className="bg-surface/50 rounded-2xl p-6 border-dashed border-2 border-primary-fixed hover:border-primary/50 flex flex-col items-center justify-center gap-4 hover:shadow-sm transition-all duration-200 cursor-pointer min-h-[180px] animate-pop-in ring-0"
+                  style={{ animationDelay: "200ms" }}
+                >
+                  <CardContent className="p-0 flex flex-col items-center justify-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-primary-fixed text-primary flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm">
+                      <span className="material-symbols-outlined text-[28px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+                        add
+                      </span>
+                    </div>
+                    <div className="font-display text-base text-on-surface font-bold text-center">
+                      Start a New Topic
+                    </div>
+                  </CardContent>
+                </Card>
               </Link>
 
             </div>

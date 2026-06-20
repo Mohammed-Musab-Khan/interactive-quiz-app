@@ -61,13 +61,18 @@ export function QuizProvider({ children }: { children: React.ReactNode }) {
         const storedCompleted = localStorage.getItem("qb_completed")
         const storedActive = localStorage.getItem("qb_active")
 
-        if (storedProfile) setProfile(JSON.parse(storedProfile))
-        if (storedCompleted) setCompletedQuizzes(JSON.parse(storedCompleted))
-        if (storedActive) setActiveQuizzes(JSON.parse(storedActive))
+        setTimeout(() => {
+          if (storedProfile) setProfile(JSON.parse(storedProfile))
+          if (storedCompleted) setCompletedQuizzes(JSON.parse(storedCompleted))
+          if (storedActive) setActiveQuizzes(JSON.parse(storedActive))
+          setLoaded(true)
+        }, 0)
       } catch (e) {
         console.error("Error loading quiz state from localStorage", e)
+        setTimeout(() => {
+          setLoaded(true)
+        }, 0)
       }
-      setLoaded(true)
     }
   }, [])
 
